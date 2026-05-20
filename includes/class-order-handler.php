@@ -27,9 +27,13 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			// Get and validate form data
 			$customer_name  = isset( $_POST['customer_name'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_name'] ) ) : '';
 			$customer_email = isset( $_POST['customer_email'] ) ? sanitize_email( wp_unslash( $_POST['customer_email'] ) ) : '';
-			$customer_phone = isset( $_POST['customer_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_phone'] ) ) : '';
-			$customer_cnpj  = isset( $_POST['customer_cnpj'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_cnpj'] ) ) : '';
-			$customer_cep   = isset( $_POST['customer_cep'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_cep'] ) ) : '';
+			$customer_phone        = isset( $_POST['customer_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_phone'] ) ) : '';
+			$customer_cnpj         = isset( $_POST['customer_cnpj'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_cnpj'] ) ) : '';
+			$customer_cep          = isset( $_POST['customer_cep'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_cep'] ) ) : '';
+			$customer_city         = isset( $_POST['customer_city'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_city'] ) ) : '';
+			$customer_state        = isset( $_POST['customer_state'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_state'] ) ) : '';
+			$customer_neighborhood = isset( $_POST['customer_neighborhood'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_neighborhood'] ) ) : '';
+			$customer_address      = isset( $_POST['customer_address'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_address'] ) ) : '';
 			$product_id     = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
 			$quantity       = isset( $_POST['quantity'] ) ? absint( wp_unslash( $_POST['quantity'] ) ) : 1;
 			$message        = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
@@ -45,6 +49,11 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 
 			if ( strlen( preg_replace( '/\D/', '', $customer_phone ) ) < 8 ) {
 				wp_send_json_error( array( 'message' => __( 'Por favor, informe um telefone válido.', 'confiar-catalog-mode' ) ) );
+			}
+
+			// CNPJ server-side validation (if provided)
+			if ( ! empty( $customer_cnpj ) && ! $this->is_valid_cnpj( $customer_cnpj ) ) {
+				wp_send_json_error( array( 'message' => __( 'CNPJ inválido. Verifique os dígitos informados.', 'confiar-catalog-mode' ) ) );
 			}
 
 			if ( $product_id <= 0 ) {
@@ -63,7 +72,7 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			}
 
 			// Create order
-			$order = $this->create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone, $customer_cnpj, $customer_cep );
+			$order = $this->create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone, $customer_cnpj, $customer_cep, $customer_city, $customer_state, $customer_neighborhood, $customer_address );
 
 			if ( is_wp_error( $order ) ) {
 				wp_send_json_error( array( 'message' => $order->get_error_message() ) );
@@ -133,12 +142,32 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			return isset( $parts[0] ) ? $parts[0] : $full_name;
 		}
 
+		private function is_valid_cnpj( $cnpj ) {
+			$cnpj = preg_replace( '/\D/', '', $cnpj );
+			if ( strlen( $cnpj ) !== 14 ) return false;
+			if ( preg_match( '/^(\d)\1+$/', $cnpj ) ) return false;
+
+			$calc = function( $cnpj, $len ) {
+				$sum = 0;
+				$pos = $len - 7;
+				for ( $i = $len; $i >= 1; $i-- ) {
+					$sum += (int) $cnpj[ $len - $i ] * $pos--;
+					if ( $pos < 2 ) $pos = 9;
+				}
+				$r = $sum % 11 < 2 ? 0 : 11 - ( $sum % 11 );
+				return $r;
+			};
+
+			return $calc( $cnpj, 12 ) === (int) $cnpj[12] &&
+			       $calc( $cnpj, 13 ) === (int) $cnpj[13];
+		}
+
 		private function extract_last_name( $full_name ) {
 			$parts = explode( ' ', trim( $full_name ) );
 			return isset( $parts[1] ) ? implode( ' ', array_slice( $parts, 1 ) ) : '';
 		}
 
-		private function create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone = '', $customer_cnpj = '', $customer_cep = '' ) {
+		private function create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone = '', $customer_cnpj = '', $customer_cep = '', $customer_city = '', $customer_state = '', $customer_neighborhood = '', $customer_address = '' ) {
 			$product = wc_get_product( $product_id );
 
 			if ( ! $product ) {
@@ -167,6 +196,19 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			}
 			if ( $customer_cep ) {
 				$order->set_billing_postcode( preg_replace( '/\D/', '', $customer_cep ) );
+			}
+			if ( $customer_city ) {
+				$order->set_billing_city( $customer_city );
+			}
+			if ( $customer_state ) {
+				$order->set_billing_state( $customer_state );
+				$order->set_billing_country( 'BR' );
+			}
+			if ( $customer_address ) {
+				$order->set_billing_address_1( $customer_address );
+			}
+			if ( $customer_neighborhood ) {
+				$order->set_billing_address_2( $customer_neighborhood );
 			}
 
 			$order->add_order_note( __( 'Orçamento solicitado via formulário rápido.', 'confiar-catalog-mode' ), false );

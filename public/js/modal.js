@@ -91,6 +91,18 @@
 				var v = $(this).val().replace(/\D/g, '').substring(0, 8);
 				if (v.length > 5) { v = v.substring(0, 5) + '-' + v.substring(5); }
 				$(this).val(v);
+				if (v.replace(/\D/g, '').length < 8) {
+					$('#cep-feedback').text('').removeClass('success error loading');
+					$('#customer_city, #customer_state, #customer_neighborhood, #customer_address').val('');
+				}
+			});
+
+			// CEP lookup on blur
+			$('#customer_cep').on('blur', function() {
+				var cep = $(this).val().replace(/\D/g, '');
+				if (cep.length === 8) {
+					ConfiarCatalogMode.lookupCep(cep);
+				}
 			});
 		},
 
@@ -112,6 +124,7 @@
 			this.$form[0].reset();
 			this.$message.hide().text('');
 			$('.confiar-form-group input, .confiar-form-group textarea').removeClass('error');
+			$('#cep-feedback').text('').removeClass('success error loading');
 			$('#product_id').val(productId);
 			$('#product_name').val(productName);
 			$('.char-count').text('0/500');
@@ -142,8 +155,12 @@
 				customer_name: $('#customer_name').val(),
 				customer_email: $('#customer_email').val(),
 				customer_phone: $('#customer_phone').val(),
-				customer_cnpj: $('#customer_cnpj').val(),
-				customer_cep: $('#customer_cep').val(),
+				customer_cnpj:         $('#customer_cnpj').val(),
+				customer_cep:          $('#customer_cep').val(),
+				customer_city:         $('#customer_city').val(),
+				customer_state:        $('#customer_state').val(),
+				customer_neighborhood: $('#customer_neighborhood').val(),
+				customer_address:      $('#customer_address').val(),
 				product_id: $('#product_id').val(),
 				quantity: $('#quantity').val(),
 				message: $('#message').val(),
@@ -208,8 +225,8 @@
 				this.clearFieldError('customer_phone');
 			}
 
-			// CNPJ validation (optional, but if filled must have 14 digits)
-			if (cnpj.length > 0 && cnpj.length !== 14) {
+			// CNPJ validation (optional, full digit-verifier algorithm)
+			if (cnpj.length > 0 && !this.isValidCNPJ(cnpj)) {
 				this.showFieldError('customer_cnpj', confiarCatalogMode.strings.invalidCnpj);
 				isValid = false;
 			} else {
@@ -238,6 +255,47 @@
 		isValidEmail: function(email) {
 			var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 			return re.test(email);
+		},
+
+		isValidCNPJ: function(cnpj) {
+			if (cnpj.length !== 14) return false;
+			if (/^(\d)\1+$/.test(cnpj)) return false; // rejects 00000000000000, 11111111111111...
+			var calcDigit = function(cnpj, len) {
+				var sum = 0, pos = len - 7;
+				for (var i = len; i >= 1; i--) {
+					sum += parseInt(cnpj.charAt(len - i)) * pos--;
+					if (pos < 2) pos = 9;
+				}
+				var r = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+				return r;
+			};
+			return calcDigit(cnpj, 12) === parseInt(cnpj.charAt(12)) &&
+			       calcDigit(cnpj, 13) === parseInt(cnpj.charAt(13));
+		},
+
+		lookupCep: function(cep) {
+			var $feedback = $('#cep-feedback');
+			$feedback.text(confiarCatalogMode.strings.cepSearching)
+			         .removeClass('success error').addClass('loading');
+
+			$.getJSON('https://viacep.com.br/ws/' + cep + '/json/', function(data) {
+				if (data.erro) {
+					$feedback.text(confiarCatalogMode.strings.cepNotFound)
+					         .removeClass('loading success').addClass('error');
+					$('#customer_city, #customer_state, #customer_neighborhood, #customer_address').val('');
+				} else {
+					var display = data.localidade + ' - ' + data.uf;
+					if (data.bairro) display += ', ' + data.bairro;
+					$feedback.text('✓ ' + display)
+					         .removeClass('loading error').addClass('success');
+					$('#customer_city').val(data.localidade || '');
+					$('#customer_state').val(data.uf || '');
+					$('#customer_neighborhood').val(data.bairro || '');
+					$('#customer_address').val(data.logradouro || '');
+				}
+			}).fail(function() {
+				$feedback.text('').removeClass('loading error success');
+			});
 		},
 
 		showFieldError: function(fieldId, message) {

@@ -152,6 +152,25 @@
 	display: block;
 }
 
+.confiar-cep-feedback {
+	font-size: 12px;
+	margin-top: 4px;
+	display: block;
+	min-height: 16px;
+}
+
+.confiar-cep-feedback.success {
+	color: #27ae60;
+}
+
+.confiar-cep-feedback.error {
+	color: #e74c3c;
+}
+
+.confiar-cep-feedback.loading {
+	color: var(--color-text, #666);
+}
+
 .char-count {
 	font-size: 12px;
 	color: var(--color-text, #666);

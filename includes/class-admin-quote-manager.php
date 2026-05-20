@@ -88,6 +88,10 @@ if ( ! class_exists( 'Confiar_Catalog_Admin_Quote_Manager' ) ) {
 			$customer_phone   = $order->get_billing_phone();
 			$customer_cnpj    = $order->get_meta( '_quote_cnpj' );
 			$customer_cep     = $order->get_billing_postcode();
+			$customer_city    = $order->get_billing_city();
+			$customer_state   = $order->get_billing_state();
+			$customer_address = $order->get_billing_address_1();
+			$customer_neighborhood = $order->get_billing_address_2();
 			$response_message = $order->get_meta( '_quote_response_message' );
 			$response_price   = $order->get_meta( '_quote_response_price' );
 
@@ -96,7 +100,7 @@ if ( ! class_exists( 'Confiar_Catalog_Admin_Quote_Manager' ) ) {
 			$default_message = __( 'Sua cotação de hoje.', 'confiar-catalog-mode' );
 			?>
 			<div class="confiar-metabox-content">
-				<?php if ( $customer_phone || $customer_cnpj || $customer_cep ) : ?>
+				<?php if ( $customer_phone || $customer_cnpj || $customer_cep || $customer_city ) : ?>
 					<div class="confiar-customer-message">
 						<h4><?php esc_html_e( 'Dados do Cliente:', 'confiar-catalog-mode' ); ?></h4>
 						<?php if ( $customer_phone ) : ?>
@@ -105,8 +109,19 @@ if ( ! class_exists( 'Confiar_Catalog_Admin_Quote_Manager' ) ) {
 						<?php if ( $customer_cnpj ) : ?>
 							<p><strong><?php esc_html_e( 'CNPJ:', 'confiar-catalog-mode' ); ?></strong> <?php echo esc_html( $customer_cnpj ); ?></p>
 						<?php endif; ?>
-						<?php if ( $customer_cep ) : ?>
-							<p><strong><?php esc_html_e( 'CEP:', 'confiar-catalog-mode' ); ?></strong> <?php echo esc_html( $customer_cep ); ?></p>
+						<?php if ( $customer_cep || $customer_city ) : ?>
+							<p>
+								<strong><?php esc_html_e( 'Localização:', 'confiar-catalog-mode' ); ?></strong>
+								<?php
+								$location = array();
+								if ( $customer_address ) $location[] = esc_html( $customer_address );
+								if ( $customer_neighborhood ) $location[] = esc_html( $customer_neighborhood );
+								if ( $customer_city ) $location[] = esc_html( $customer_city );
+								if ( $customer_state ) $location[] = esc_html( $customer_state );
+								if ( $customer_cep ) $location[] = 'CEP ' . esc_html( $customer_cep );
+								echo implode( ', ', $location );
+								?>
+							</p>
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>

@@ -59,8 +59,10 @@ if ( ! class_exists( 'Confiar_Catalog_Quote_Form' ) ) {
 						'invalidName'  => __( 'Por favor, informe seu nome (mínimo 3 caracteres).', 'confiar-catalog-mode' ),
 						'invalidQty'   => __( 'Por favor, informe uma quantidade válida.', 'confiar-catalog-mode' ),
 						'invalidPhone' => __( 'Por favor, informe um telefone válido.', 'confiar-catalog-mode' ),
-						'invalidCnpj'  => __( 'CNPJ inválido. Informe os 14 dígitos corretamente.', 'confiar-catalog-mode' ),
+						'invalidCnpj'  => __( 'CNPJ inválido. Verifique os dígitos informados.', 'confiar-catalog-mode' ),
 						'invalidCep'   => __( 'CEP inválido. Informe os 8 dígitos corretamente.', 'confiar-catalog-mode' ),
+						'cepSearching' => __( 'Buscando endereço...', 'confiar-catalog-mode' ),
+						'cepNotFound'  => __( 'CEP não encontrado.', 'confiar-catalog-mode' ),
 						'sending'      => __( 'Enviando...', 'confiar-catalog-mode' ),
 						'submit'       => get_option( 'confiar_catalog_mode_button_text', __( 'Solicitar Orçamento', 'confiar-catalog-mode' ) ),
 					),
@@ -171,10 +173,17 @@ if ( ! class_exists( 'Confiar_Catalog_Quote_Form' ) ) {
 										name="customer_cep"
 										maxlength="9"
 										placeholder="<?php esc_attr_e( '89000-000', 'confiar-catalog-mode' ); ?>"
+										autocomplete="postal-code"
 									>
 									<span class="confiar-error"></span>
+									<span id="cep-feedback" class="confiar-cep-feedback"></span>
 								</div>
 							</div>
+
+							<input type="hidden" id="customer_city"         name="customer_city">
+							<input type="hidden" id="customer_state"        name="customer_state">
+							<input type="hidden" id="customer_neighborhood" name="customer_neighborhood">
+							<input type="hidden" id="customer_address"      name="customer_address">
 
 							<div class="confiar-form-group">
 								<label for="product_id">
