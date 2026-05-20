@@ -245,6 +245,26 @@
 	text-decoration: none;
 }
 
+/* Single product quote button — mirrors Blonwe WhatsApp button style */
+.confiar-quote-wrapper {
+	margin-bottom: 1.25rem;
+}
+
+.confiar-quote-wrapper a.confiar-quick-quote-btn {
+	color: #fff !important;
+	background-color: var(--color-green700, #2F9E44) !important;
+	border-color: transparent !important;
+	height: 2.875rem;
+}
+
+.confiar-quote-wrapper a.confiar-quick-quote-btn:hover {
+	background-color: var(--color-green800, #29843B) !important;
+	color: #fff !important;
+	opacity: 1;
+	transform: none;
+	box-shadow: none;
+}
+
 /* Dark mode support */
 [data-theme="dark"] .confiar-modal-content {
 	background: var(--color-gray0, #1e2124);
