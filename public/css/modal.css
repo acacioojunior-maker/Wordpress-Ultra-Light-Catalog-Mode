@@ -1,0 +1,272 @@
+/* Confiar Catalog Mode Modal Styles */
+
+.confiar-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: none;
+	z-index: 9999;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.confiar-modal.active {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.confiar-modal-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 1;
+}
+
+.confiar-modal-content {
+	position: relative;
+	background: var(--color-gray0, #fff);
+	color: var(--color-text, #333);
+	border-radius: 8px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+	max-width: 500px;
+	width: 90%;
+	max-height: 90vh;
+	overflow-y: auto;
+	z-index: 2;
+}
+
+.confiar-modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px;
+	border-bottom: 1px solid var(--color-gray900, #eee);
+}
+
+.confiar-modal-header h2 {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 600;
+}
+
+.confiar-modal-close {
+	background: none;
+	border: none;
+	font-size: 28px;
+	cursor: pointer;
+	color: var(--color-text, #333);
+	padding: 0;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: opacity 0.2s;
+}
+
+.confiar-modal-close:hover {
+	opacity: 0.7;
+}
+
+.confiar-modal-body {
+	padding: 20px;
+}
+
+.confiar-notification {
+	background: var(--theme-primary-color, #ffc21f);
+	color: #000;
+	padding: 12px 15px;
+	border-radius: 4px;
+	margin-bottom: 20px;
+	font-size: 14px;
+}
+
+.confiar-form {
+	display: flex;
+	flex-direction: column;
+}
+
+.confiar-form-row {
+	display: flex;
+	gap: 12px;
+}
+
+.confiar-form-group {
+	margin-bottom: 18px;
+	display: flex;
+	flex-direction: column;
+}
+
+.confiar-form-group--half {
+	flex: 1;
+}
+
+.confiar-form-group label {
+	margin-bottom: 6px;
+	font-weight: 500;
+	font-size: 14px;
+}
+
+.confiar-form .required {
+	color: #e74c3c;
+	margin-left: 2px;
+}
+
+.confiar-form-group input,
+.confiar-form-group textarea {
+	padding: 10px 12px;
+	border: 1px solid var(--color-gray900, #ddd);
+	border-radius: 4px;
+	font-size: 14px;
+	font-family: inherit;
+	background: var(--color-gray0, #fff);
+	color: var(--color-text, #333);
+	transition: border-color 0.2s;
+}
+
+.confiar-form-group input:focus,
+.confiar-form-group textarea:focus {
+	outline: none;
+	border-color: var(--theme-primary-color, #ffc21f);
+	box-shadow: 0 0 0 3px rgba(255, 194, 31, 0.1);
+}
+
+.confiar-form-group textarea {
+	resize: vertical;
+	min-height: 80px;
+}
+
+.confiar-error {
+	color: #e74c3c;
+	font-size: 12px;
+	margin-top: 4px;
+	display: none;
+}
+
+.confiar-error.show {
+	display: block;
+}
+
+.char-count {
+	font-size: 12px;
+	color: var(--color-text, #666);
+	margin-top: 4px;
+	display: block;
+}
+
+.confiar-submit-btn {
+	padding: 12px 20px;
+	font-size: 16px;
+	font-weight: 600;
+	background: var(--theme-primary-color, #ffc21f);
+	color: #000;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.2s;
+	margin-top: 10px;
+}
+
+.confiar-submit-btn:hover {
+	background: var(--theme-primary-color, #ffc21f);
+	opacity: 0.9;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(255, 194, 31, 0.3);
+}
+
+.confiar-submit-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.confiar-message {
+	padding: 15px;
+	border-radius: 4px;
+	margin-bottom: 15px;
+	font-size: 14px;
+}
+
+.confiar-message.success {
+	background: #d4edda;
+	color: #155724;
+	border: 1px solid #c3e6cb;
+}
+
+.confiar-message.error {
+	background: #f8d7da;
+	color: #721c24;
+	border: 1px solid #f5c6cb;
+}
+
+.confiar-quick-quote-btn {
+	cursor: pointer;
+	background: var(--theme-primary-color, #ffc21f);
+	color: #000;
+	border: none;
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 4px;
+	transition: all 0.2s;
+	text-decoration: none;
+	display: inline-block;
+}
+
+.confiar-quick-quote-btn:hover {
+	opacity: 0.9;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(255, 194, 31, 0.3);
+	color: #000;
+	text-decoration: none;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .confiar-modal-content {
+	background: var(--color-gray0, #1e2124);
+	color: var(--color-text, #ecedee);
+}
+
+[data-theme="dark"] .confiar-form-group input,
+[data-theme="dark"] .confiar-form-group textarea {
+	background: var(--color-gray0, #1e2124);
+	color: var(--color-text, #ecedee);
+	border-color: var(--color-gray900, #444);
+}
+
+[data-theme="dark"] .confiar-modal-header {
+	border-bottom-color: var(--color-gray900, #444);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+	.confiar-form-row {
+		flex-direction: column;
+		gap: 0;
+	}
+}
+
+@media (max-width: 600px) {
+	.confiar-modal-content {
+		max-width: 95%;
+		border-radius: 0;
+	}
+
+	.confiar-modal-header {
+		padding: 15px;
+	}
+
+	.confiar-modal-body {
+		padding: 15px;
+	}
+
+	.confiar-form-group input,
+	.confiar-form-group textarea {
+		font-size: 16px;
+	}
+}
