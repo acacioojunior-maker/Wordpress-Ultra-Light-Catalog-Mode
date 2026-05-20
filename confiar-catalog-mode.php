@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Confiar Catalog Mode
- * Plugin URI: https://confiar.net.br
+ * Plugin URI: https://github.com/acacioojunior-maker/wp-catalog-mode
  * Description: Modo catálogo com orçamento rápido para WooCommerce
  * Author: Confiar
  * Version: 1.0.5

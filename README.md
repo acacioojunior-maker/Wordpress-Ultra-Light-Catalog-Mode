@@ -1,152 +1,114 @@
 # Confiar Catalog Mode
 
-Plugin WordPress para transformar WooCommerce em modo catálogo com sistema de orçamento rápido.
+Plugin WordPress/WooCommerce que transforma a loja em **modo catálogo B2B**: oculta preços, substitui o botão de compra por "Solicitar Orçamento" e gerencia todo o fluxo de cotação direto no painel — sem plugins de terceiros, sem conflito de CSS com temas customizados.
 
-## Descrição
+## Description
 
-Este plugin permite que lojistas convertam seu WooCommerce para modo catálogo, ocultando preços e substituindo o botão "Adicionar ao Carrinho" por um "Orçamento Rápido". Clientes podem solicitar orçamentos com formulário minimalista, criando automaticamente uma conta WooCommerce e gerando um pedido de orçamento no painel.
+Desenvolvido para lojas B2B (distribuidoras, atacadistas, indústrias) que não exibem preços publicamente e operam via cotação. O plugin oferece:
 
-## Características
+- **Toggle ON/OFF** sem perda de dados — ativa e desativa o modo catálogo com um clique
+- **Modal de orçamento rápido** com campos B2B: Nome, E-mail, Telefone, CNPJ, CEP, Produto, Quantidade e Mensagem
+- **Máscaras automáticas** nos campos de Telefone, CNPJ e CEP
+- **Criação automática de cliente** WooCommerce ao receber o primeiro orçamento
+- **Status customizado "Orçamento Pendente"** (wc-rfq) integrado ao painel de pedidos
+- **Metabox de resposta** no pedido: admin envia preço e mensagem; cliente recebe e-mail com link para checkout
+- **Notificações por e-mail** em português para cliente e administrador, com Reply-To correto para respostas diretas
+- **Compatível com HPOS** (High-Performance Order Storage do WooCommerce)
+- **Dark mode** via variáveis CSS — sem `!important`, sem conflito com temas Blonwe/customizados
+- **Auto-update** via GitHub — notificação de atualização direto no painel WordPress
 
-- ✅ **Modo Catálogo Toggle**: Ativar/desativar com um clique nas configurações
-- ✅ **Ocultar Preços**: Todos os preços desaparecem quando ativado
-- ✅ **Modal Orçamento Rápido**: Formulário minimalista (nome, email, qtd, mensagem)
-- ✅ **Criar Cliente Automaticamente**: Cliente novo é criado no WooCommerce
-- ✅ **Gravar como Order**: Orçamento salvo como pedido (status: "RFQ")
-- ✅ **Emails Automáticos**: Notificações para cliente e lojista
-- ✅ **Responder no Painel**: Admin pode enviar proposta de preço customizado
-- ✅ **Dark Mode Suportado**: CSS integrado com variáveis tema Blonwe
-- ✅ **Performance**: Zero overhead quando desativado
-- ✅ **Segurança**: Validação nonce, sanitização, escapagem
-
-## Requisitos
+### Requisitos
 
 - WordPress 5.0+
 - WooCommerce 3.9+
 - PHP 7.2+
 
-## Instalação
+### Instalação
 
-1. Upload do plugin para `/wp-content/plugins/confiar-catalog-mode/`
-2. Ativar plugin em WordPress → Plugins
-3. Ir para Configurações → Confiar Catalog Mode
-4. Marcar "Ativar Modo Catálogo"
-5. Personalizar textos dos botões se desejar
+1. Baixe o ZIP da [última release](https://github.com/acacioojunior-maker/wp-catalog-mode/releases)
+2. WordPress → Plugins → Adicionar novo → Enviar plugin → Ativar
+3. Configurações → Confiar Catalog Mode → marcar **Ativar Modo Catálogo**
 
-## Como Usar
+### Fluxo de uso
 
-### Para Lojistas
+**Cliente:** vê produto sem preço → clica "Solicitar Orçamento" → preenche formulário → recebe confirmação por e-mail.
 
-1. **Ativar Modo Catálogo**: Configurações → Confiar Catalog Mode → Ativar
-2. **Ir para Loja**: Preços desaparecem, botão muda para "Orçamento Rápido"
-3. **Receber Orçamentos**: Orçamentos chegam via email e no painel de Pedidos
-4. **Responder no Painel**: Abra o pedido (status: Orçamento Pendente) → Enviar Proposta de Preço
+**Lojista:** recebe e-mail com dados do cliente (telefone, CNPJ, CEP) → abre pedido no painel → preenche preço e mensagem → clica "Enviar Resposta ao Cliente" → cliente recebe proposta com link para checkout.
 
-### Para Clientes
-
-1. Vê produto sem preço
-2. Clica "Orçamento Rápido"
-3. Preenche: nome, email, quantidade, mensagem (opcional)
-4. Clica "Enviar Orçamento"
-5. Recebe confirmação por email
-6. Admin envia proposta customizada
-7. Cliente clica link → vai ao checkout para aceitar
-
-## Estrutura de Arquivos
+### Estrutura de arquivos
 
 ```
 confiar-catalog-mode/
-├── confiar-catalog-mode.php          # Arquivo principal
+├── confiar-catalog-mode.php
+├── uninstall.php
 ├── includes/
-│   ├── class-main.php                # Inicializador
-│   ├── class-settings.php            # Painel de opções
-│   ├── class-product-display.php     # Hooks para ocultar preço
-│   ├── class-quote-form.php          # Renderização modal
-│   ├── class-order-handler.php       # AJAX + criar cliente/order
-│   ├── class-email-notifier.php      # Notificações email
-│   └── class-admin-quote-manager.php # Gerenciador painel
+│   ├── class-main.php
+│   ├── class-settings.php
+│   ├── class-product-display.php
+│   ├── class-quote-form.php
+│   ├── class-order-handler.php
+│   ├── class-email-notifier.php
+│   └── class-admin-quote-manager.php
 ├── public/
-│   ├── css/modal.css                 # Estilos modal
-│   └── js/modal.js                   # Lógica JavaScript
-└── templates/emails/                 # Templates email
+│   ├── css/modal.css
+│   └── js/modal.js
+├── templates/emails/
+│   ├── customer-quote-notification.php
+│   └── admin-quote-notification.php
+└── lib/
+    └── plugin-update-checker/
 ```
 
-## Status Customizado "RFQ"
-
-Orçamentos são salvos com status `wc-rfq` (Quote Pending). No painel de pedidos:
-- Coluna "Type" mostra ícone de cotação
-- Pedidos RFQ aparecem no dropdown de status
-- Quando desativa plugin, converte para "draft" (preserva dados)
-
-## Hooks Disponíveis
+### Hook disponível
 
 ```php
-// Disparado quando orçamento é enviado
+// Disparado após orçamento enviado — útil para integrações CRM/Zapier
 do_action( 'confiar_quote_submitted', $order, $customer_name, $customer_email );
 ```
 
-## Segurança
+## Changelog
 
-- ✅ Validação de nonce em AJAX
-- ✅ Sanitização de inputs (`sanitize_text_field`, `sanitize_email`, etc)
-- ✅ Escapagem de outputs (`esc_html`, `esc_attr`, `wp_kses_post`)
-- ✅ Verificação de permissões (`current_user_can`)
-- ✅ Validação de email
-- ✅ Proteção contra rate limiting (opcional v2)
+### 1.0.5
+* Corrige bug crítico: hook de desativação convertia pedidos rfq→pending durante updates, destruindo orçamentos ativos
+* Limpeza de dados (rfq→pending + remoção de opções) movida para `uninstall.php` — executa apenas ao deletar o plugin permanentemente
 
-## Performance
+### 1.0.4
+* Adiciona campos B2B ao formulário: **Telefone** (obrigatório, nativo WooCommerce), **CNPJ** (meta customizado) e **CEP** (nativo WooCommerce)
+* Máscaras automáticas de digitação para Telefone `(00) 00000-0000`, CNPJ `00.000.000/0000-00` e CEP `00000-000`
+* CNPJ e CEP em layout lado a lado, responsivo
+* Metabox do admin agora exibe Telefone, CNPJ e CEP do cliente
+* E-mail para admin inclui telefone clicável (`tel:`), CNPJ e CEP
+* Link do e-mail admin atualizado para URL HPOS (`admin.php?page=wc-orders`)
+* Todos os templates de e-mail traduzidos para português
+* Implementa auto-update via GitHub usando plugin-update-checker v5.6
+* Plugin URI atualizado para o repositório GitHub
 
-- **CSS/JS carregados apenas em páginas de produto/shop**
-- **Hooks executados apenas quando modo catálogo ativo**
-- **Zero overhead quando desativado**
-- **Minificação recomendada**
+### 1.0.3
+* Traduz todos os textos de UI e e-mails para português (pt-BR)
+* Adiciona cabeçalhos `From:` e `Reply-To:` corretos nos e-mails para melhor entregabilidade
+* E-mail do admin: Reply-To aponta para o cliente (resposta direta via e-mail)
+* E-mail do cliente: Reply-To aponta para a loja
+* Placeholder padrão "Sua cotação de hoje." no campo de mensagem do vendedor
+* Notas do pedido e labels de status em português
 
-## Compatibilidade
+### 1.0.2
+* Corrige compatibilidade com HPOS (High-Performance Order Storage)
+* Adiciona declaração `FeaturesUtil::declare_compatibility()` antes da inicialização do WooCommerce
+* Substitui `get_posts()` por `wc_get_orders()` na desativação (compatível com HPOS e CPT legado)
+* Suporte a colunas nas telas de pedidos HPOS e legado simultaneamente
 
-- ✅ Tema Confiar/Confiar-child
-- ✅ Dark mode (Blonwe)
-- ✅ Dispositivos móveis (responsivo)
-- ✅ WooCommerce 3.9+
-- ✅ Plugins WooCommerce padrão
+### 1.0.1
+* Corrige status `wc-rfq` desaparecendo após primeiro request (mover `register_post_status` para hook `init`)
+* Corrige metabox sempre mostrando "não é uma solicitação de orçamento" (`get_status()` retorna `rfq`, não `wc-rfq`)
+* Corrige botão de orçamento não aparecendo em produto individual (produtos sem preço não disparam `woocommerce_after_add_to_cart_button`)
+* Corrige botão WhatsApp do tema Blonwe não sendo removido corretamente
 
-## Desativação & Dados
-
-- **Ao desativar**: Orçamentos (RFQ) são convertidos para "draft"
-- **Ao remover**: Opções plugin removidas, clientes/orders preservados
-- **Toggle**: Ativa/desativa modo sem perder dados históricos
-
-## Troubleshooting
-
-**Modal não aparece:**
-- Verifique se modo catálogo está ativado
-- Verifique console browser (F12 → Console)
-- Teste com tema padrão para descartar conflito CSS
-
-**Emails não chegam:**
-- Verifique configuração SMTP WordPress
-- Teste com plugin "WP Mail SMTP" ou similar
-- Verifique pasta spam
-
-**Clientes não são criados:**
-- Verifique se "Ativar registros de clientes" está ON (WooCommerce)
-- Verifique logs WP-Debug
-
-## Futuras Melhorias (v2)
-
-- [ ] Rate limiting por IP
-- [ ] Integração CRM/Zapier
-- [ ] Relatórios de orçamentos
-- [ ] Descontos automáticos
-- [ ] Integração com formulários custom
-- [ ] Multi-idioma completo
-
-## Suporte
-
-Para dúvidas ou bugs, reporte em `/CLAUDE.md` ou contate desenvolvedor.
-
----
-
-**Versão:** 1.0.0  
-**Licença:** GPL v2+  
-**Autor:** Confiar  
-**Compatibilidade WC:** 3.9+
+### 1.0.0
+* Versão inicial
+* Modo catálogo com toggle ON/OFF
+* Modal de orçamento rápido
+* Criação automática de cliente WooCommerce
+* Status customizado "Orçamento Pendente" (wc-rfq)
+* Metabox para resposta de orçamento no painel admin
+* Notificações por e-mail para cliente e administrador
+* Compatibilidade com dark mode via CSS variables
