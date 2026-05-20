@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Confiar Catalog Mode
- * Plugin URI: https://github.com/acacioojunior-maker/wp-catalog-mode
+ * Plugin URI: https://github.com/acacioojunior-maker/Wordpress-Ultra-Light-Catalog-Mode
  * Description: Modo catálogo com orçamento rápido para WooCommerce
  * Author: Confiar
  * Version: 1.0.5
@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
 // GitHub auto-updates via plugin-update-checker
 require_once plugin_dir_path( __FILE__ ) . 'lib/plugin-update-checker/plugin-update-checker.php';
 $confiar_updater = YahnisElsts\PluginUpdateChecker\v5p6\PucFactory::buildUpdateChecker(
-	'https://github.com/acacioojunior-maker/wp-catalog-mode',
+	'https://github.com/acacioojunior-maker/Wordpress-Ultra-Light-Catalog-Mode',
 	__FILE__,
 	'confiar-catalog-mode'
 );
