@@ -4,7 +4,7 @@
  * Plugin URI: https://confiar.net.br
  * Description: Modo catálogo com orçamento rápido para WooCommerce
  * Author: Confiar
- * Version: 1.0.4
+ * Version: 1.0.5
  * Text Domain: confiar-catalog-mode
  * Domain Path: /languages
  * WC requires at least: 3.9
@@ -47,7 +47,7 @@ if ( ! class_exists( 'Confiar_Catalog_Mode' ) ) {
 		}
 
 		private function define_constants() {
-			define( 'CONFIAR_CATALOG_MODE_VERSION', '1.0.4' );
+			define( 'CONFIAR_CATALOG_MODE_VERSION', '1.0.5' );
 			define( 'CONFIAR_CATALOG_MODE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 			define( 'CONFIAR_CATALOG_MODE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 			define( 'CONFIAR_CATALOG_MODE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -70,21 +70,6 @@ if ( ! class_exists( 'Confiar_Catalog_Mode' ) ) {
 		}
 
 		public function deactivate() {
-			// Use WooCommerce order query API (works with both HPOS and legacy CPT)
-			if ( function_exists( 'wc_get_orders' ) ) {
-				$rfq_orders = wc_get_orders( array(
-					'status' => 'rfq',
-					'limit'  => -1,
-					'return' => 'ids',
-				) );
-				foreach ( $rfq_orders as $order_id ) {
-					$order = wc_get_order( $order_id );
-					if ( $order ) {
-						$order->set_status( 'pending' );
-						$order->save();
-					}
-				}
-			}
 			flush_rewrite_rules();
 		}
 
