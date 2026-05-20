@@ -13,6 +13,15 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// GitHub auto-updates via plugin-update-checker
+require_once plugin_dir_path( __FILE__ ) . 'lib/plugin-update-checker/plugin-update-checker.php';
+$confiar_updater = YahnisElsts\PluginUpdateChecker\v5p6\PucFactory::buildUpdateChecker(
+	'https://github.com/acacioojunior-maker/wp-catalog-mode',
+	__FILE__,
+	'confiar-catalog-mode'
+);
+$confiar_updater->setBranch( 'main' );
+
 // Declare HPOS compatibility — must run before WooCommerce initializes
 add_action( 'before_woocommerce_init', function() {
 	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
