@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/acacioojunior-maker/Wordpress-Ultra-Light-Catalog-Mode
  * Description: Modo catálogo com orçamento rápido para WooCommerce
  * Author: Confiar
- * Version: 1.0.9
+ * Version: 1.1.0
  * Text Domain: confiar-catalog-mode
  * Domain Path: /languages
  * WC requires at least: 3.9
@@ -13,18 +13,13 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// GitHub auto-updates via plugin-update-checker
+// Auto-updates via plugin.json no GitHub raw (sem GitHub API, sem rate limit)
 require_once plugin_dir_path( __FILE__ ) . 'lib/plugin-update-checker/plugin-update-checker.php';
-$confiar_updater = YahnisElsts\PluginUpdateChecker\v5p6\PucFactory::buildUpdateChecker(
-	'https://github.com/acacioojunior-maker/Wordpress-Ultra-Light-Catalog-Mode',
+YahnisElsts\PluginUpdateChecker\v5p6\PucFactory::buildUpdateChecker(
+	'https://raw.githubusercontent.com/acacioojunior-maker/Wordpress-Ultra-Light-Catalog-Mode/main/plugin.json',
 	__FILE__,
 	'confiar-catalog-mode'
 );
-$confiar_updater->setBranch( 'main' );
-// Token defined in wp-config.php as: define('CONFIAR_GITHUB_TOKEN', 'ghp_...');
-if ( defined( 'CONFIAR_GITHUB_TOKEN' ) && CONFIAR_GITHUB_TOKEN ) {
-	$confiar_updater->setAuthentication( CONFIAR_GITHUB_TOKEN );
-}
 
 // Declare HPOS compatibility — must run before WooCommerce initializes
 add_action( 'before_woocommerce_init', function() {
@@ -51,7 +46,7 @@ if ( ! class_exists( 'Confiar_Catalog_Mode' ) ) {
 		}
 
 		private function define_constants() {
-			define( 'CONFIAR_CATALOG_MODE_VERSION', '1.0.9' );
+			define( 'CONFIAR_CATALOG_MODE_VERSION', '1.1.0' );
 			define( 'CONFIAR_CATALOG_MODE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 			define( 'CONFIAR_CATALOG_MODE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 			define( 'CONFIAR_CATALOG_MODE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
