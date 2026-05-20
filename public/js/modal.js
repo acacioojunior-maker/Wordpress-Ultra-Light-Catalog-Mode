@@ -54,17 +54,18 @@
 				$('.char-count').text(length + '/500');
 			});
 
-			// Phone mask: (XX) XXXXX-XXXX or (XX) XXXX-XXXX
+			// Phone mask: (XX) XXXXX-XXXX (mobile) or (XX) XXXX-XXXX (landline)
 			$('#customer_phone').on('input', function() {
-				var v = $(this).val().replace(/\D/g, '').substring(0, 11);
-				if (v.length > 2) { v = '(' + v.substring(0, 2) + ') ' + v.substring(2); }
-				if (v.replace(/\D/g, '').length > 10) {
-					v = v.substring(0, v.length - 1 - (v.length > 10 ? 0 : 0));
-					var digits = v.replace(/\D/g, '');
-					v = '(' + digits.substring(0, 2) + ') ' + digits.substring(2, 7) + '-' + digits.substring(7);
-				} else if (v.replace(/\D/g, '').length > 6) {
-					var digits = v.replace(/\D/g, '');
-					v = '(' + digits.substring(0, 2) + ') ' + digits.substring(2, 6) + '-' + digits.substring(6);
+				var d = $(this).val().replace(/\D/g, '').substring(0, 11);
+				var v = d;
+				if (d.length > 10) {
+					v = '(' + d.substring(0, 2) + ') ' + d.substring(2, 7) + '-' + d.substring(7);
+				} else if (d.length > 6) {
+					v = '(' + d.substring(0, 2) + ') ' + d.substring(2, 6) + '-' + d.substring(6);
+				} else if (d.length > 2) {
+					v = '(' + d.substring(0, 2) + ') ' + d.substring(2);
+				} else if (d.length > 0) {
+					v = '(' + d;
 				}
 				$(this).val(v);
 			});
