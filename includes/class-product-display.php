@@ -26,6 +26,9 @@ if ( ! class_exists( 'Confiar_Catalog_Product_Display' ) ) {
 			// Remove Blonwe WhatsApp button (priority 29) when catalog mode is active
 			add_action( 'woocommerce_single_product_summary', array( $this, 'maybe_remove_whatsapp_button' ), 1 );
 			add_filter( 'woocommerce_widget_shopping_cart_button_text', array( $this, 'hide_cart_button_text' ), 999 );
+			add_filter( 'body_class', array( $this, 'add_catalog_body_class' ) );
+			// Runs after theme loads: replaces "Item sob consulta." with "Obter orçamento" link
+			add_action( 'init', array( $this, 'setup_catalog_hooks' ), 20 );
 		}
 
 		public function is_catalog_mode_enabled() {
@@ -100,6 +103,37 @@ if ( ! class_exists( 'Confiar_Catalog_Product_Display' ) ) {
 			}
 			// Return empty to hide the button completely
 			return '';
+		}
+
+		public function add_catalog_body_class( $classes ) {
+			if ( $this->is_catalog_mode_enabled() ) {
+				$classes[] = 'confiar-catalog-active';
+			}
+			return $classes;
+		}
+
+		public function setup_catalog_hooks() {
+			if ( ! $this->is_catalog_mode_enabled() ) {
+				return;
+			}
+			// Replace Blonwe's shipping-class label ("Item sob consulta.") with our quote link
+			remove_action( 'blonwe_product_box_footer', 'blonwe_shipping_class_name', 10 );
+			add_action( 'blonwe_product_box_footer', array( $this, 'output_loop_quote_link' ), 10, 3 );
+		}
+
+		public function output_loop_quote_link( $stockprogressbar = '', $stockstatus = '', $shippingclass = '' ) {
+			if ( $shippingclass !== 'true' || is_product() ) {
+				return;
+			}
+			global $product;
+			if ( ! $product ) {
+				return;
+			}
+			printf(
+				'<a href="#" class="product-delivery-time confiar-footer-quote-link confiar-quick-quote-btn" data-product-id="%s">%s</a>',
+				esc_attr( $product->get_id() ),
+				esc_html__( 'Obter orçamento', 'confiar-catalog-mode' )
+			);
 		}
 	}
 }

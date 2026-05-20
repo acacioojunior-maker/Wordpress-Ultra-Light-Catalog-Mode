@@ -265,6 +265,35 @@
 	box-shadow: none;
 }
 
+/* Loop/shop product card: override Blonwe's primary-button (orange) for our quote button */
+.product-buttons.primary-button .confiar-quick-quote-btn,
+.confiar-catalog-active .product-buttons .confiar-quick-quote-btn {
+	background-color: var(--color-green700, #2F9E44) !important;
+	color: #fff !important;
+	border-color: transparent !important;
+}
+
+.product-buttons.primary-button .confiar-quick-quote-btn:hover,
+.confiar-catalog-active .product-buttons .confiar-quick-quote-btn:hover {
+	background-color: var(--color-green800, #29843B) !important;
+	color: #fff !important;
+	opacity: 1;
+	transform: none;
+	box-shadow: none;
+}
+
+/* Footer "Obter orçamento" link that replaces "Item sob consulta." in product cards */
+.confiar-footer-quote-link.product-delivery-time {
+	color: var(--color-green700, #2F9E44);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.confiar-footer-quote-link.product-delivery-time:hover {
+	color: var(--color-green800, #29843B);
+	text-decoration: underline;
+}
+
 /* Dark mode support */
 [data-theme="dark"] .confiar-modal-content {
 	background: var(--color-gray0, #1e2124);
