@@ -15,8 +15,19 @@ if ( ! class_exists( 'Confiar_Catalog_Main' ) ) {
 
 		private function __construct() {
 			add_action( 'init', array( $this, 'register_rfq_status' ) );
+			add_action( 'init', array( $this, 'migrate_options' ), 5 );
 			$this->load_classes();
 			$this->init_classes();
+		}
+
+		public function migrate_options() {
+			// Migrate English defaults to Portuguese (one-time, auto-heal)
+			if ( get_option( 'confiar_catalog_mode_button_text' ) === 'Quick Quote' ) {
+				update_option( 'confiar_catalog_mode_button_text', 'Pedir orçamento' );
+			}
+			if ( strpos( (string) get_option( 'confiar_catalog_mode_notification_text' ), 'catalog mode' ) !== false ) {
+				update_option( 'confiar_catalog_mode_notification_text', 'Esta loja está em modo catálogo. Clique em "Pedir orçamento" para solicitar uma cotação deste produto.' );
+			}
 		}
 
 		public function register_rfq_status() {

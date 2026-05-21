@@ -91,11 +91,20 @@
 				}
 			});
 
-			// CNPJ lookup on blur — calls Brasil API (free, no key needed)
+			// CNPJ validation + lookup on blur
 			$('#customer_cnpj').on('blur', function() {
 				var cnpj = $(this).val().replace(/\D/g, '');
+				if (cnpj.length === 0) {
+					return; // campo vazio — sem validação
+				}
 				if (cnpj.length === 14 && ConfiarCatalogMode.isValidCNPJ(cnpj)) {
-					ConfiarCatalogMode.lookupCnpj(cnpj);
+					ConfiarCatalogMode.clearFieldError('customer_cnpj');
+					ConfiarCatalogMode.lookupCnpj(cnpj); // consulta Brasil API
+				} else {
+					// CNPJ incompleto ou dígitos verificadores errados
+					ConfiarCatalogMode.showFieldError('customer_cnpj', confiarCatalogMode.strings.invalidCnpj);
+					$('#cnpj-feedback').text('').removeClass('success error loading warning');
+					$('#customer_company').val('');
 				}
 			});
 

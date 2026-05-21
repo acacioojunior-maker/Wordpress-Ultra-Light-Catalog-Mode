@@ -53,7 +53,7 @@ if ( ! class_exists( 'Confiar_Catalog_Product_Display' ) ) {
 				return $html;
 			}
 
-			$button_text = get_option( 'confiar_catalog_mode_button_text', __( 'Quick Quote', 'confiar-catalog-mode' ) );
+			$button_text = get_option( 'confiar_catalog_mode_button_text', __( 'Pedir orçamento', 'confiar-catalog-mode' ) );
 
 			return sprintf(
 				'<a href="#" class="button alt confiar-quick-quote-btn" data-product-id="%s">%s</a>',

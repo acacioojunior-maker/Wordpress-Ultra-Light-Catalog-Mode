@@ -82,7 +82,7 @@ if ( ! class_exists( 'Confiar_Catalog_Quote_Form' ) ) {
 				return;
 			}
 
-			$notification_text = get_option( 'confiar_catalog_mode_notification_text', __( 'This store is in catalog mode. Click "Quick Quote" to request a quote for this product.', 'confiar-catalog-mode' ) );
+			$notification_text = get_option( 'confiar_catalog_mode_notification_text', __( 'Esta loja está em modo catálogo. Clique em "Pedir orçamento" para solicitar uma cotação deste produto.', 'confiar-catalog-mode' ) );
 			$button_text       = get_option( 'confiar_catalog_mode_button_text', __( 'Solicitar Orçamento', 'confiar-catalog-mode' ) );
 
 			?>
