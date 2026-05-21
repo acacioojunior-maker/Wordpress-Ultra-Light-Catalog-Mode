@@ -192,6 +192,9 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 
 			// Set billing data (native WooCommerce fields)
 			$order->set_billing_email( $customer_email );
+			if ( $customer_company ) {
+				$order->set_billing_company( $customer_company );
+			}
 			if ( $customer_phone ) {
 				$order->set_billing_phone( $customer_phone );
 			}
