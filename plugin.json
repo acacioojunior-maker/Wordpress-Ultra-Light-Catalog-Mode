@@ -7,7 +7,7 @@
     "requires": "5.0",
     "requires_php": "7.2",
     "tested": "6.7",
-    "download_url": "https://github.com/acacioojunior-maker/Wordpress-Ultra-Light-Catalog-Mode/archive/refs/heads/main.zip",
+    "download_url": "https://codeload.github.com/acacioojunior-maker/Wordpress-Ultra-Light-Catalog-Mode/zip/refs/heads/main",
     "sections": {
         "description": "Modo catálogo B2B para WooCommerce: oculta preços, substitui botão de compra por formulário de orçamento rápido com campos de Telefone, CNPJ e CEP (autocomplete via ViaCEP). Gerencia todo o fluxo de cotação direto no painel.",
         "changelog": "<h4>1.1.1</h4><p>Remove botão laranja residual do add-to-cart no carrossel de produtos. Substitui texto \"Item sob consulta.\" por link \"Obter orçamento\" nos cards de produto.</p><h4>1.1.0</h4><p>Auto-update via raw.githubusercontent.com (sem GitHub API, sem rate limit).</p><h4>1.0.9</h4><p>Botão de orçamento na página de produto com mesmo estilo verde do botão WhatsApp do tema Blonwe.</p><h4>1.0.8</h4><p>Suporte a token GitHub via wp-config.php para evitar rate limiting da API.</p><h4>1.0.7</h4><p>Corrige máscara de telefone que cortava o último dígito.</p><h4>1.0.6</h4><p>Validação completa de CNPJ (algoritmo dígito verificador) e autocomplete de CEP via ViaCEP.</p><h4>1.0.5</h4><p>Corrige conversão indevida de pedidos rfq durante updates do plugin.</p><h4>1.0.4</h4><p>Campos B2B: Telefone, CNPJ, CEP. Auto-update via GitHub.</p>"
