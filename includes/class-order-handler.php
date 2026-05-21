@@ -34,6 +34,7 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$customer_state        = isset( $_POST['customer_state'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_state'] ) ) : '';
 			$customer_neighborhood = isset( $_POST['customer_neighborhood'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_neighborhood'] ) ) : '';
 			$customer_address      = isset( $_POST['customer_address'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_address'] ) ) : '';
+			$customer_company      = isset( $_POST['customer_company'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_company'] ) ) : '';
 			$product_id     = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
 			$quantity       = isset( $_POST['quantity'] ) ? absint( wp_unslash( $_POST['quantity'] ) ) : 1;
 			$message        = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
@@ -72,7 +73,7 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			}
 
 			// Create order
-			$order = $this->create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone, $customer_cnpj, $customer_cep, $customer_city, $customer_state, $customer_neighborhood, $customer_address );
+			$order = $this->create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone, $customer_cnpj, $customer_cep, $customer_city, $customer_state, $customer_neighborhood, $customer_address, $customer_company );
 
 			if ( is_wp_error( $order ) ) {
 				wp_send_json_error( array( 'message' => $order->get_error_message() ) );
@@ -167,7 +168,7 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			return isset( $parts[1] ) ? implode( ' ', array_slice( $parts, 1 ) ) : '';
 		}
 
-		private function create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone = '', $customer_cnpj = '', $customer_cep = '', $customer_city = '', $customer_state = '', $customer_neighborhood = '', $customer_address = '' ) {
+		private function create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone = '', $customer_cnpj = '', $customer_cep = '', $customer_city = '', $customer_state = '', $customer_neighborhood = '', $customer_address = '', $customer_company = '' ) {
 			$product = wc_get_product( $product_id );
 
 			if ( ! $product ) {
@@ -226,6 +227,9 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$order->update_meta_data( '_quote_request_date', current_time( 'mysql' ) );
 			if ( $customer_cnpj ) {
 				$order->update_meta_data( '_quote_cnpj', $customer_cnpj );
+			}
+			if ( $customer_company ) {
+				$order->update_meta_data( '_quote_company', $customer_company );
 			}
 
 			$order->calculate_totals();

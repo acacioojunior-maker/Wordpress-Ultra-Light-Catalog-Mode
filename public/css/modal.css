@@ -152,23 +152,31 @@
 	display: block;
 }
 
-.confiar-cep-feedback {
+.confiar-cep-feedback,
+.confiar-cnpj-feedback {
 	font-size: 12px;
 	margin-top: 4px;
 	display: block;
 	min-height: 16px;
 }
 
-.confiar-cep-feedback.success {
+.confiar-cep-feedback.success,
+.confiar-cnpj-feedback.success {
 	color: #27ae60;
 }
 
-.confiar-cep-feedback.error {
+.confiar-cep-feedback.error,
+.confiar-cnpj-feedback.error {
 	color: #e74c3c;
 }
 
-.confiar-cep-feedback.loading {
+.confiar-cep-feedback.loading,
+.confiar-cnpj-feedback.loading {
 	color: var(--color-text, #666);
+}
+
+.confiar-cnpj-feedback.warning {
+	color: #e67e22;
 }
 
 .char-count {

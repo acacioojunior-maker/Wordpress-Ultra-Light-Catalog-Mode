@@ -61,9 +61,12 @@ if ( ! class_exists( 'Confiar_Catalog_Quote_Form' ) ) {
 						'invalidPhone' => __( 'Por favor, informe um telefone válido.', 'confiar-catalog-mode' ),
 						'invalidCnpj'  => __( 'CNPJ inválido. Verifique os dígitos informados.', 'confiar-catalog-mode' ),
 						'invalidCep'   => __( 'CEP inválido. Informe os 8 dígitos corretamente.', 'confiar-catalog-mode' ),
-						'cepSearching' => __( 'Buscando endereço...', 'confiar-catalog-mode' ),
-						'cepNotFound'  => __( 'CEP não encontrado.', 'confiar-catalog-mode' ),
-						'sending'      => __( 'Enviando...', 'confiar-catalog-mode' ),
+						'cepSearching'  => __( 'Buscando endereço...', 'confiar-catalog-mode' ),
+						'cepNotFound'   => __( 'CEP não encontrado.', 'confiar-catalog-mode' ),
+						'cnpjSearching' => __( 'Consultando Receita Federal...', 'confiar-catalog-mode' ),
+						'cnpjNotFound'  => __( 'CNPJ não encontrado na Receita Federal.', 'confiar-catalog-mode' ),
+						'cnpjInactive'  => __( 'Empresa com situação cadastral irregular.', 'confiar-catalog-mode' ),
+						'sending'       => __( 'Enviando...', 'confiar-catalog-mode' ),
 						'submit'       => get_option( 'confiar_catalog_mode_button_text', __( 'Solicitar Orçamento', 'confiar-catalog-mode' ) ),
 					),
 				)
@@ -161,6 +164,7 @@ if ( ! class_exists( 'Confiar_Catalog_Quote_Form' ) ) {
 										placeholder="<?php esc_attr_e( '00.000.000/0001-00', 'confiar-catalog-mode' ); ?>"
 									>
 									<span class="confiar-error"></span>
+									<span id="cnpj-feedback" class="confiar-cnpj-feedback"></span>
 								</div>
 
 								<div class="confiar-form-group confiar-form-group--half">
@@ -184,6 +188,7 @@ if ( ! class_exists( 'Confiar_Catalog_Quote_Form' ) ) {
 							<input type="hidden" id="customer_state"        name="customer_state">
 							<input type="hidden" id="customer_neighborhood" name="customer_neighborhood">
 							<input type="hidden" id="customer_address"      name="customer_address">
+							<input type="hidden" id="customer_company"      name="customer_company">
 
 							<div class="confiar-form-group">
 								<label for="product_id">

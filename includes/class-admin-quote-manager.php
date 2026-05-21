@@ -85,6 +85,7 @@ if ( ! class_exists( 'Confiar_Catalog_Admin_Quote_Manager' ) ) {
 			}
 
 			$customer_message = $order->get_meta( '_quote_message' );
+			$customer_company = $order->get_meta( '_quote_company' );
 			$customer_phone   = $order->get_billing_phone();
 			$customer_cnpj    = $order->get_meta( '_quote_cnpj' );
 			$customer_cep     = $order->get_billing_postcode();
@@ -100,9 +101,12 @@ if ( ! class_exists( 'Confiar_Catalog_Admin_Quote_Manager' ) ) {
 			$default_message = __( 'Sua cotação de hoje.', 'confiar-catalog-mode' );
 			?>
 			<div class="confiar-metabox-content">
-				<?php if ( $customer_phone || $customer_cnpj || $customer_cep || $customer_city ) : ?>
+				<?php if ( $customer_company || $customer_phone || $customer_cnpj || $customer_cep || $customer_city ) : ?>
 					<div class="confiar-customer-message">
 						<h4><?php esc_html_e( 'Dados do Cliente:', 'confiar-catalog-mode' ); ?></h4>
+						<?php if ( $customer_company ) : ?>
+							<p><strong><?php esc_html_e( 'Empresa:', 'confiar-catalog-mode' ); ?></strong> <?php echo esc_html( $customer_company ); ?></p>
+						<?php endif; ?>
 						<?php if ( $customer_phone ) : ?>
 							<p><strong><?php esc_html_e( 'Telefone:', 'confiar-catalog-mode' ); ?></strong> <?php echo esc_html( $customer_phone ); ?></p>
 						<?php endif; ?>
