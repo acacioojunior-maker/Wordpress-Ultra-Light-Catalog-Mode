@@ -24,6 +24,16 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Invalid security check.', 'confiar-catalog-mode' ) ) );
 			}
 
+			// Rate limiting
+			$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+			if ( $ip ) {
+				$transient_name = 'confiar_quote_ratelimit_' . md5( $ip );
+				if ( get_transient( $transient_name ) ) {
+					wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'confiar-catalog-mode' ) ) );
+				}
+				set_transient( $transient_name, true, MINUTE_IN_SECONDS );
+			}
+
 			// Get and validate form data
 			$customer_name  = isset( $_POST['customer_name'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_name'] ) ) : '';
 			$customer_email = isset( $_POST['customer_email'] ) ? sanitize_email( wp_unslash( $_POST['customer_email'] ) ) : '';
@@ -171,7 +181,7 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 		private function create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone = '', $customer_cnpj = '', $customer_cep = '', $customer_city = '', $customer_state = '', $customer_neighborhood = '', $customer_address = '', $customer_company = '' ) {
 			$product = wc_get_product( $product_id );
 
-			if ( ! $product ) {
+			if ( ! $product || $product->get_status() !== 'publish' ) {
 				return new WP_Error( 'invalid_product', __( 'Product not found.', 'confiar-catalog-mode' ) );
 			}
 
