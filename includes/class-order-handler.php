@@ -95,7 +95,12 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$customer = get_user_by( 'email', $email );
 
 			if ( $customer ) {
-				return $customer->ID;
+				// Security fix: prevent unauthenticated users from assigning orders to existing accounts
+				if ( is_user_logged_in() && get_current_user_id() === $customer->ID ) {
+					return $customer->ID;
+				}
+				// Treat as guest order if not logged in as the customer
+				return 0;
 			}
 
 			// Create new customer
