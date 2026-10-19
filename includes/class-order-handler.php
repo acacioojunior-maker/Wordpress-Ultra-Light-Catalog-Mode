@@ -91,11 +91,17 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 		}
 
 		private function get_or_create_customer( $name, $email ) {
-			// Check if customer exists
-			$customer = get_user_by( 'email', $email );
+			// Security fix: IDOR / Account Hijacking
+			// If logged in, use the current user ID.
+			if ( is_user_logged_in() ) {
+				return get_current_user_id();
+			}
 
+			// Check if customer exists. If they do but we are not logged in as them,
+			// fallback to guest (0) instead of attaching the order to their account.
+			$customer = get_user_by( 'email', $email );
 			if ( $customer ) {
-				return $customer->ID;
+				return 0; // Guest checkout to protect existing user account
 			}
 
 			// Create new customer
