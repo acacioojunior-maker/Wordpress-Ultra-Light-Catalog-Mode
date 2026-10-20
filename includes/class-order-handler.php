@@ -95,7 +95,14 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$customer = get_user_by( 'email', $email );
 
 			if ( $customer ) {
-				return $customer->ID;
+				// SECURITY: Prevent IDOR (Authorization Bypass).
+				// Do not associate the order with an existing user account unless the user is actively logged in as that account.
+				if ( is_user_logged_in() && get_current_user_id() === $customer->ID ) {
+					return $customer->ID;
+				}
+				// If the email exists but the user is not logged in as that user, assign the order to guest (0)
+				// to avoid exposing order details to unauthorized actors or allowing unauthenticated order injection.
+				return 0;
 			}
 
 			// Create new customer
