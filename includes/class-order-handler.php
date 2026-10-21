@@ -24,6 +24,14 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Invalid security check.', 'confiar-catalog-mode' ) ) );
 			}
 
+			// 🛡️ SECURITY: Add rate limiting to prevent email bombing and DoS
+			$ip_address = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+			$rate_limit_key = 'confiar_quote_rate_limit_' . md5( $ip_address );
+			if ( get_transient( $rate_limit_key ) ) {
+				wp_send_json_error( array( 'message' => __( 'Muitas solicitações. Aguarde um minuto antes de tentar novamente.', 'confiar-catalog-mode' ) ) );
+			}
+			set_transient( $rate_limit_key, 1, MINUTE_IN_SECONDS );
+
 			// Get and validate form data
 			$customer_name  = isset( $_POST['customer_name'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_name'] ) ) : '';
 			$customer_email = isset( $_POST['customer_email'] ) ? sanitize_email( wp_unslash( $_POST['customer_email'] ) ) : '';
@@ -95,7 +103,12 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$customer = get_user_by( 'email', $email );
 
 			if ( $customer ) {
-				return $customer->ID;
+				// 🛡️ SECURITY: Prevent unauthenticated users from injecting orders into existing accounts
+				if ( is_user_logged_in() && get_current_user_id() === $customer->ID ) {
+					return $customer->ID;
+				}
+				// If not logged in as the owner of the email, assign to guest (0)
+				return 0;
 			}
 
 			// Create new customer
