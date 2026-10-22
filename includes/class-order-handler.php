@@ -95,7 +95,13 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$customer = get_user_by( 'email', $email );
 
 			if ( $customer ) {
-				return $customer->ID;
+				// Security: Only attach to existing account if the user is authenticated
+				// as that user. Prevents IDOR where guest attaches quotes to admin/other accounts.
+				if ( is_user_logged_in() && wp_get_current_user()->user_email === $email ) {
+					return $customer->ID;
+				}
+				// Return 0 for guest order if account exists but user isn't logged in
+				return 0;
 			}
 
 			// Create new customer
