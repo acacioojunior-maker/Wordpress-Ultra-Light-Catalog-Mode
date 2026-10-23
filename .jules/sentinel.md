@@ -1,0 +1,4 @@
+## 2024-05-24 - [IDOR in WooCommerce Unauthenticated Guest Order Linking]
+**Vulnerability:** The `get_or_create_customer()` function allowed any unauthenticated user to submit an order request specifying the email address of any existing account (e.g., Administrator), automatically linking that order to the existing user's account by returning their ID directly.
+**Learning:** Returning an existing user's ID solely based on an email match provided via a public form allows unauthorized manipulation of that user's data (IDOR / Authorization Bypass), potentially filling their account with spam or causing logic bugs in plugins that rely on accurate order history.
+**Prevention:** Always verify `is_user_logged_in()` and `get_current_user_id() === $customer->ID` before implicitly trusting an email match from unauthenticated input. Return `0` (Guest) if the unauthenticated email matches an existing account.

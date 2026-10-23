@@ -95,7 +95,13 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$customer = get_user_by( 'email', $email );
 
 			if ( $customer ) {
-				return $customer->ID;
+				// 🛡️ SECURITY: Prevent IDOR (Authorization Bypass)
+				// Do not link order to existing account if the user is not authenticated as that account.
+				if ( is_user_logged_in() && get_current_user_id() === $customer->ID ) {
+					return $customer->ID;
+				}
+				// Return 0 (Guest) to prevent unauthorized users from polluting existing accounts.
+				return 0;
 			}
 
 			// Create new customer
