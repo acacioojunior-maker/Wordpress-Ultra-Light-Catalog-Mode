@@ -19,6 +19,21 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 		}
 
 		public function handle_quote_submission() {
+			// [SECURITY] Rate Limiting Check: Prevent spam and resource exhaustion on unauthenticated endpoint
+			$client_ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+			if ( $client_ip !== 'unknown' ) {
+				$transient_key = 'confiar_rate_limit_' . md5( $client_ip );
+				$attempts      = get_transient( $transient_key );
+
+				if ( false === $attempts ) {
+					set_transient( $transient_key, 1, MINUTE_IN_SECONDS * 5 ); // Limit: 3 attempts per 5 mins
+				} elseif ( $attempts >= 3 ) {
+					wp_send_json_error( array( 'message' => __( 'Muitas requisições. Tente novamente mais tarde.', 'confiar-catalog-mode' ) ) );
+				} else {
+					set_transient( $transient_key, $attempts + 1, MINUTE_IN_SECONDS * 5 );
+				}
+			}
+
 			// Verify nonce
 			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'confiar_quote_nonce' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Invalid security check.', 'confiar-catalog-mode' ) ) );
@@ -40,8 +55,17 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$message        = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
 
 			// Validate inputs
-			if ( empty( $customer_name ) || strlen( $customer_name ) < 3 ) {
-				wp_send_json_error( array( 'message' => __( 'Por favor, informe seu nome (mínimo 3 caracteres).', 'confiar-catalog-mode' ) ) );
+			// [SECURITY] Enforce length limits on inputs to prevent resource exhaustion and buffer issues
+			if ( empty( $customer_name ) || strlen( $customer_name ) < 3 || strlen( $customer_name ) > 100 ) {
+				wp_send_json_error( array( 'message' => __( 'Por favor, informe seu nome (mínimo 3 caracteres, máximo 100).', 'confiar-catalog-mode' ) ) );
+			}
+
+			if ( strlen( $message ) > 1000 ) {
+				wp_send_json_error( array( 'message' => __( 'A mensagem deve ter no máximo 1000 caracteres.', 'confiar-catalog-mode' ) ) );
+			}
+
+			if ( strlen( $customer_phone ) > 20 ) {
+				wp_send_json_error( array( 'message' => __( 'Número de telefone muito longo.', 'confiar-catalog-mode' ) ) );
 			}
 
 			if ( ! is_email( $customer_email ) ) {
