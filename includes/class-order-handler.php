@@ -19,6 +19,14 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 		}
 
 		public function handle_quote_submission() {
+			// Rate limiting to prevent spam and DoS
+			$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+			$transient_name = 'confiar_quote_limit_' . md5( $ip );
+			if ( get_transient( $transient_name ) ) {
+				wp_send_json_error( array( 'message' => __( 'Too many requests. Please wait a moment before trying again.', 'confiar-catalog-mode' ) ) );
+			}
+			set_transient( $transient_name, true, MINUTE_IN_SECONDS ); // Limit to 1 request per minute per IP
+
 			// Verify nonce
 			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'confiar_quote_nonce' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Invalid security check.', 'confiar-catalog-mode' ) ) );
@@ -40,8 +48,12 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$message        = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
 
 			// Validate inputs
-			if ( empty( $customer_name ) || strlen( $customer_name ) < 3 ) {
-				wp_send_json_error( array( 'message' => __( 'Por favor, informe seu nome (mínimo 3 caracteres).', 'confiar-catalog-mode' ) ) );
+			if ( empty( $customer_name ) || strlen( $customer_name ) < 3 || strlen( $customer_name ) > 100 ) {
+				wp_send_json_error( array( 'message' => __( 'Por favor, informe seu nome (entre 3 e 100 caracteres).', 'confiar-catalog-mode' ) ) );
+			}
+
+			if ( strlen( $message ) > 1000 ) {
+				wp_send_json_error( array( 'message' => __( 'A mensagem deve ter no máximo 1000 caracteres.', 'confiar-catalog-mode' ) ) );
 			}
 
 			if ( ! is_email( $customer_email ) ) {
