@@ -95,7 +95,12 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 			$customer = get_user_by( 'email', $email );
 
 			if ( $customer ) {
-				return $customer->ID;
+				// Security: Only assign to existing account if user is logged in as that account
+				if ( is_user_logged_in() && get_current_user_id() === $customer->ID ) {
+					return $customer->ID;
+				}
+				// Otherwise, treat as guest order to prevent unauthorized account association
+				return 0;
 			}
 
 			// Create new customer
@@ -171,7 +176,7 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 		private function create_quote_order( $customer_id, $product_id, $quantity, $message, $customer_email, $customer_phone = '', $customer_cnpj = '', $customer_cep = '', $customer_city = '', $customer_state = '', $customer_neighborhood = '', $customer_address = '', $customer_company = '' ) {
 			$product = wc_get_product( $product_id );
 
-			if ( ! $product ) {
+			if ( ! $product || $product->get_status() !== 'publish' ) {
 				return new WP_Error( 'invalid_product', __( 'Product not found.', 'confiar-catalog-mode' ) );
 			}
 
