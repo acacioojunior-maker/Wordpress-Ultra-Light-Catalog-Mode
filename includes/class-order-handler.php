@@ -19,6 +19,23 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 		}
 
 		public function handle_quote_submission() {
+			// 🛡️ Security: Rate limiting by IP to prevent DoS attacks and spam
+			$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '127.0.0.1';
+			$transient_name = 'confiar_quote_limit_' . md5( $ip );
+
+			$rate_data = get_transient( $transient_name );
+			if ( false === $rate_data || ! is_array( $rate_data ) ) {
+				$rate_data = array( 'count' => 0, 'expires' => time() + ( 10 * MINUTE_IN_SECONDS ) );
+			}
+
+			if ( $rate_data['count'] >= 5 ) {
+				wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'confiar-catalog-mode' ) ) );
+			}
+
+			$rate_data['count']++;
+			$ttl = max( 1, $rate_data['expires'] - time() );
+			set_transient( $transient_name, $rate_data, $ttl );
+
 			// Verify nonce
 			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'confiar_quote_nonce' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Invalid security check.', 'confiar-catalog-mode' ) ) );
