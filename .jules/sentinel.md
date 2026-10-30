@@ -1,0 +1,4 @@
+## 2024-10-30 - Prevent Order History Pollution/Spoofing (IDOR) via Email Matching
+**Vulnerability:** The quote submission endpoint unauthenticated allowed anyone to use an existing registered user's email address and successfully have the new order assigned to that user's ID. This could pollute order history and leak information if the legitimate user reviews their orders, or create malicious quotes on behalf of administrators.
+**Learning:** Automatically assigning an order/quote to a user ID based solely on a matching email address provided in a public form creates an Insecure Direct Object Reference (IDOR) and allows data pollution.
+**Prevention:** Always verify `is_user_logged_in()` and check that `get_current_user_id()` matches the retrieved user ID when deciding to link new guest-submitted data to an existing user account. Fall back to guest (ID 0) otherwise.
