@@ -19,6 +19,19 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 		}
 
 		public function handle_quote_submission() {
+			// 🛡️ Sentinel: Add IP-based rate limiting to prevent email bombing/spam
+			$ip_address = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+			if ( $ip_address ) {
+				$transient_name = 'confiar_quote_limit_' . md5( $ip_address );
+				$attempts       = (int) get_transient( $transient_name );
+
+				if ( $attempts >= 5 ) {
+					wp_send_json_error( array( 'message' => __( 'Muitas requisições. Tente novamente mais tarde.', 'confiar-catalog-mode' ) ) );
+				}
+
+				set_transient( $transient_name, $attempts + 1, 5 * MINUTE_IN_SECONDS );
+			}
+
 			// Verify nonce
 			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'confiar_quote_nonce' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Invalid security check.', 'confiar-catalog-mode' ) ) );
@@ -91,11 +104,15 @@ if ( ! class_exists( 'Confiar_Catalog_Order_Handler' ) ) {
 		}
 
 		private function get_or_create_customer( $name, $email ) {
-			// Check if customer exists
+			// 🛡️ Sentinel: Prevent IDOR (associating quote to an existing user without authentication)
 			$customer = get_user_by( 'email', $email );
 
 			if ( $customer ) {
-				return $customer->ID;
+				// If user exists, they must be logged in to claim the order, otherwise assign to guest (ID 0)
+				if ( is_user_logged_in() && get_current_user_id() === $customer->ID ) {
+					return $customer->ID;
+				}
+				return 0; // Create as guest order
 			}
 
 			// Create new customer
